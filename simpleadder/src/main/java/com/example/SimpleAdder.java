@@ -3,21 +3,21 @@ package com.example;
 import java.util.Random;
 
 import javafx.application.Application;
-import javafx.stage.Stage;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.layout.Region;
 import javafx.scene.layout.Priority;
-import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
 
 public class SimpleAdder extends Application {
     private static Random random = new Random();
@@ -29,6 +29,7 @@ public class SimpleAdder extends Application {
     private Label outputLabel;
     private Label warningLabel;
     private Node outputRow;
+    private ComboBox<String> operator;
 
     public static void main(String[] args) {
         launch(args);
@@ -58,7 +59,6 @@ public class SimpleAdder extends Application {
         heading.setMaxWidth(Double.MAX_VALUE);
         heading.setAlignment(Pos.CENTER);
         heading.getStyleClass().add("heading-label");
-        heading.setPadding(new Insets(10));
         return heading;
     }
 
@@ -88,12 +88,17 @@ public class SimpleAdder extends Application {
         var outputPane = new StackPane(outputRow, warningLabel);
         return outputPane;
     }
-
+    
     private Node createOutputRow() {
         labelA = new Label("0");
         labelB = new Label("0");
+        operator = new ComboBox<>();
+
+        operator.getItems().addAll("+", "-", "*", "/");
+        operator.setValue("+");
         outputLabel = new Label("0");
-        var outputRow = new HBox(10, labelA, new Label("+"), labelB, new Label("="), outputLabel);
+        outputLabel.setStyle("-fx-text-fill: blue;"); 
+        var outputRow = new HBox(10, labelA, operator, labelB, new Label("="), outputLabel);
         outputRow.setAlignment(Pos.CENTER);
         return outputRow;
     }
@@ -105,39 +110,53 @@ public class SimpleAdder extends Application {
     }
 
     private Node createButtonRow() {
-        var randomizeButton = createRandomizeButton();
-        randomizeButton.setStyle("-fx-background-color: purple; -fx-text-fill: white");  // Add style here instead
-        
-        var buttonRow = new HBox(20, randomizeButton, createAddButton());
+        var buttonRow = new HBox(20, createRandomizeButton(), createAddButton());
         buttonRow.setPadding(new Insets(0, 0, 20, 0));
         buttonRow.setAlignment(Pos.CENTER);
-        //buttonRow.setStyle("-fx-background-color: purple");  // Comment out or remove this line if it exists
         return buttonRow;
     }
 
     private Node createRandomizeButton() {
         var randomizeButton = new Button("Randomize");
-        randomizeButton.setStyle("-fx-background-color: purple; -fx-text-fill: white");  // ADD THIS LINE
         randomizeButton.setOnAction(evt -> {
-            textFieldA.setText(String.valueOf(random.nextInt(-1000, 1000)));
-            textFieldB.setText(String.valueOf(random.nextInt(-1000, 1000)));
-            
+            textFieldA.setText(String.valueOf(rangeRandomInt(-1000, 1000)));
+            textFieldB.setText(String.valueOf(rangeRandomInt(-1000, 1000)));
         });
-    
         return randomizeButton;
     }
-
+    private int rangeRandomInt(int start, int end){
+        int a=random.nextInt(start, end-1);
+        return a;
+    }
     private Node createAddButton() {
-        var addButton = new Button("Add");
+        var addButton = new Button("Calculate");
         addButton.setOnAction(evt -> {
             String valueA = textFieldA.getText();
             String valueB = textFieldB.getText();
             labelA.setText(valueA);
             labelB.setText(valueB);
+            String operatorread = operator.getValue();
+            
             try {
-                outputLabel.setText(String.valueOf(Integer.parseInt(valueA) + Integer.parseInt(valueB)));
+                Float a=Float.valueOf(valueA);
+                Float b=Float.valueOf(valueB);
+                Float c;
+                if(operatorread=="+"){
+                    outputLabel.setText(String.valueOf(a+b));
+                }else if(operatorread=="-"){
+                    outputLabel.setText(String.valueOf(a-b));
+                }else if(operatorread=="*"){
+                    outputLabel.setText(String.valueOf(a*b));
+                }else if(operatorread=="/"){
+                    if(b!=0){outputLabel.setText(String.valueOf(a/b));
+                    }else{throw new ArithmeticException("Divide by zero.");}
+                }
+                
                 showOutput();
             } catch (NumberFormatException e) {
+                showWarning();
+            } catch(ArithmeticException e){
+                warningLabel.setText("Divide by zero");
                 showWarning();
             }
         });
@@ -153,4 +172,5 @@ public class SimpleAdder extends Application {
         outputRow.setVisible(false);
         warningLabel.setVisible(true);
     }
+   
 }
