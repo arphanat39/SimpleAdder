@@ -2,7 +2,7 @@
   text-color: #363636;
   bg-color: #F5F5F5;
   banner-text-color: #FFFFFF;
-  banner-bg-color: #deadff;
+  banner-bg-color: #de71bd;
 
   -fx-text-fill: text-color;
   -fx-background-color: bg-color;
@@ -24,4 +24,13 @@
 .warning {
   -fx-text-fill: #FF5100;
   -fx-font-weight: bold;
+}
+.custom-button{
+  -fx-text-fill: #FFFFFF;
+  -fx-background-color: #f793eb; 
+  -fx-font-size: 14px;
+  -fx-font-weight: bold;
+  -fx-padding: 8px 16px;
+  -fx-border-radius: 5px;
+  -fx-background-radius: 5px;
 }

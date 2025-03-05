@@ -118,6 +118,7 @@ public class SimpleAdder extends Application {
 
     private Node createRandomizeButton() {
         var randomizeButton = new Button("Randomize");
+        randomizeButton.getStyleClass().add("custom-button");
         randomizeButton.setOnAction(evt -> {
             textFieldA.setText(String.valueOf(rangeRandomInt(-1000, 1000)));
             textFieldB.setText(String.valueOf(rangeRandomInt(-1000, 1000)));
@@ -131,6 +132,7 @@ public class SimpleAdder extends Application {
 
     private Node createAddButton() {
         var addButton = new Button("Calculate");
+        addButton.getStyleClass().add("custom-button");
         addButton.setOnAction(evt -> {
             String valueA = textFieldA.getText();
             String valueB = textFieldB.getText();
