@@ -30,6 +30,7 @@ public class SimpleAdder extends Application {
     private Label warningLabel;
     private Node outputRow;
     private ComboBox<String> operator;
+    private Label operatorLabel; // Store operator label to update it dynamically
 
     public static void main(String[] args) {
         launch(args);
@@ -38,7 +39,6 @@ public class SimpleAdder extends Application {
     @Override
     public void start(Stage stage) {
         var scene = new Scene(createMainView(), 500, 200);
-
         stage.setScene(scene);
         stage.setTitle("Simple Adder");
         stage.show();
@@ -65,18 +65,21 @@ public class SimpleAdder extends Application {
     private Node createCenterContent() {
         var inputRow = createInputRow();
         var outputPane = createOutputPane();
-
         var centerContent = new VBox(20, inputRow, outputPane);
         centerContent.setPadding(new Insets(20));
         centerContent.setAlignment(Pos.CENTER);
-
         return centerContent;
     }
 
     private Node createInputRow() {
         textFieldA = new TextField("0");
         textFieldB = new TextField("0");
-        var inputRow = new HBox(20, new Label("A:"), textFieldA, new Label("B:"), textFieldB);
+    
+        operator = new ComboBox<>();
+        operator.getItems().addAll("+", "-", "*", "/");
+        operator.setValue("+");
+    
+        var inputRow = new HBox(10, new Label("A:"), textFieldA, operator, new Label("B:"), textFieldB);
         inputRow.setAlignment(Pos.CENTER);
         return inputRow;
     }
@@ -88,17 +91,14 @@ public class SimpleAdder extends Application {
         var outputPane = new StackPane(outputRow, warningLabel);
         return outputPane;
     }
-    
+
     private Node createOutputRow() {
         labelA = new Label("0");
         labelB = new Label("0");
-        operator = new ComboBox<>();
-
-        operator.getItems().addAll("+", "-", "*", "/");
-        operator.setValue("+");
+        operatorLabel = new Label(operator.getValue()); // Use dynamic operator label
         outputLabel = new Label("0");
-        outputLabel.setStyle("-fx-text-fill: blue;"); 
-        var outputRow = new HBox(10, labelA, operator, labelB, new Label("="), outputLabel);
+        outputLabel.setStyle("-fx-text-fill: blue;");
+        var outputRow = new HBox(10, labelA, operatorLabel, labelB, new Label("="), outputLabel);
         outputRow.setAlignment(Pos.CENTER);
         return outputRow;
     }
@@ -124,10 +124,11 @@ public class SimpleAdder extends Application {
         });
         return randomizeButton;
     }
-    private int rangeRandomInt(int start, int end){
-        int a=random.nextInt(start, end-1);
-        return a;
+
+    private int rangeRandomInt(int start, int end) {
+        return random.nextInt(end - start) + start;
     }
+
     private Node createAddButton() {
         var addButton = new Button("Calculate");
         addButton.setOnAction(evt -> {
@@ -136,26 +137,27 @@ public class SimpleAdder extends Application {
             labelA.setText(valueA);
             labelB.setText(valueB);
             String operatorread = operator.getValue();
-            
+            operatorLabel.setText(operatorread); // Update the operator label dynamically
+
             try {
-                Float a=Float.valueOf(valueA);
-                Float b=Float.valueOf(valueB);
-                Float c;
-                if(operatorread=="+"){
-                    outputLabel.setText(String.valueOf(a+b));
-                }else if(operatorread=="-"){
-                    outputLabel.setText(String.valueOf(a-b));
-                }else if(operatorread=="*"){
-                    outputLabel.setText(String.valueOf(a*b));
-                }else if(operatorread=="/"){
-                    if(b!=0){outputLabel.setText(String.valueOf(a/b));
-                    }else{throw new ArithmeticException("Divide by zero.");}
+                Float a = Float.valueOf(valueA);
+                Float b = Float.valueOf(valueB);
+                switch (operatorread) {
+                    case "+" -> outputLabel.setText(String.valueOf(a + b));
+                    case "-" -> outputLabel.setText(String.valueOf(a - b));
+                    case "*" -> outputLabel.setText(String.valueOf(a * b));
+                    case "/" -> {
+                        if (b != 0) {
+                            outputLabel.setText(String.valueOf(a / b));
+                        } else {
+                            throw new ArithmeticException("Divide by zero.");
+                        }
+                    }
                 }
-                
                 showOutput();
             } catch (NumberFormatException e) {
                 showWarning();
-            } catch(ArithmeticException e){
+            } catch (ArithmeticException e) {
                 warningLabel.setText("Divide by zero");
                 showWarning();
             }
@@ -172,5 +174,4 @@ public class SimpleAdder extends Application {
         outputRow.setVisible(false);
         warningLabel.setVisible(true);
     }
-   
 }
